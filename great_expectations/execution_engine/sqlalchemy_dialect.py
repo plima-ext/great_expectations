@@ -18,6 +18,7 @@ class GESqlDialect(enum.Enum):
     SQLITE = "sqlite"
     TERADATASQL = "teradatasql"
     TRINO = "trino"
+    DATABRICKS = "databricks"
 
     @classmethod
     def _missing_(cls, value: Any) -> None:
