@@ -592,7 +592,6 @@ class SqlAlchemyDataset(MetaSqlAlchemyDataset):
             "oracle",
             "mssql",
             "hive",
-            "databricks"
         ]:
             # These are the officially included and supported dialects by sqlalchemy
             self.dialect = import_library_module(
