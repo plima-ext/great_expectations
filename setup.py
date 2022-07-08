@@ -26,6 +26,7 @@ def get_extras_require():
         "snowflake",
         "teradata",
         "trino",
+        "databricks"
     )
     ignore_keys = ("contrib", "sqlalchemy", "test")
     rx_fname_part = re.compile(r"requirements-dev-(.*).txt")
