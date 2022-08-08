@@ -495,6 +495,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         self._config = {
             "bucket": bucket,
             "prefix": prefix,
+            "role_arn": role_arn,
             "boto3_options": boto3_options,
             "s3_put_options": s3_put_options,
             "filepath_template": filepath_template,
@@ -728,7 +729,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
     def _assume_role(self):
         import boto3
-        
+
         # create an STS client object that represents a live connection to the
         # STS service
         sts_client = boto3.client("sts")
