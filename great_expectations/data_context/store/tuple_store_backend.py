@@ -757,7 +757,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
             self.boto3_options["aws_access_key_id"] = credentials["AccessKeyId"]
             self.boto3_options["aws_secret_access_key"] = credentials["SecretAccessKey"]
             self.boto3_options["aws_session_token"] = credentials["SessionToken"]
-            logger.info(f"Setting up S3 resource with access key ID {self.boto3_options['aws_access_key_id']}.")
+            logger.info(f"Setting up S3 resource with access key ID {credentials['AccessKeyId']}.")
 
         return boto3.resource("s3", **self.boto3_options)
 
