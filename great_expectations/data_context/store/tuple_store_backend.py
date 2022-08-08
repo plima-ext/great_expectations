@@ -754,11 +754,9 @@ class TupleS3StoreBackend(TupleStoreBackend):
         logger.info(f"Creating resource with role_arn {self.role_arn}.")
         if self.role_arn:
             credentials = self._assume_role()
-            self.boto3_options.update(
-                aws_access_key_id=credentials["AccessKeyId"],
-                aws_secret_access_key=credentials["SecretAccessKey"],
-                aws_session_token=credentials["SessionToken"],
-            )
+            self.boto3_options["aws_access_key_id"] = credentials["AccessKeyId"]
+            self.boto3_options["aws_secret_access_key"] = credentials["SecretAccessKey"]
+            self.boto3_options["aws_session_token"] = credentials["SessionToken"]
             logger.info(f"Setting up S3 resource with access key ID {self.boto3_options['aws_access_key_id']}.")
 
         return boto3.resource("s3", **self.boto3_options)
