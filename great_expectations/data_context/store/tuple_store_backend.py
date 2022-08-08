@@ -442,6 +442,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         self,
         bucket,
         prefix="",
+        role_arn=None,
         boto3_options=None,
         s3_put_options=None,
         filepath_template=None,
@@ -477,6 +478,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
             # whether the rest of the key is built with platform-specific separators or not
             prefix = prefix.strip("/")
         self.prefix = prefix
+        self.role_arn = role_arn
         if boto3_options is None:
             boto3_options = {}
         self._boto3_options = boto3_options
@@ -719,10 +721,37 @@ class TupleS3StoreBackend(TupleStoreBackend):
     def _create_client(self):
         import boto3
 
+        if self.role_arn:
+            self._assume_role(self)
+
         return boto3.client("s3", **self.boto3_options)
+
+    def _assume_role(self):
+        # create an STS client object that represents a live connection to the
+        # STS service
+        sts_client = boto3.client("sts")
+
+        # Call the assume_role method of the STSConnection object and pass the role
+        # ARN and a role session name.
+        assumed_role_object = sts_client.assume_role(
+            RoleArn=self.role_arn, RoleSessionName="AssumedRoleSession"
+        )
+
+        # From the response that contains the assumed role, get the temporary
+        # credentials that can be used to make subsequent API calls
+        credentials = assumed_role_object["Credentials"]
+
+        self.boto3_options.update(
+            aws_access_key_id=credentials["AccessKeyId"],
+            aws_secret_access_key=credentials["SecretAccessKey"],
+            aws_session_token=credentials["SessionToken"],
+        )
 
     def _create_resource(self):
         import boto3
+
+        if self.role_arn:
+            self._assume_role(self)
 
         return boto3.resource("s3", **self.boto3_options)
 
