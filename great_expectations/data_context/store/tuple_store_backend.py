@@ -758,10 +758,10 @@ class TupleS3StoreBackend(TupleStoreBackend):
     def _create_resource(self):
         import boto3
 
+        logger.info(f"Creating resource with role_arn {self.role_arn}.")
         if self.role_arn:
             self._assume_role()
-
-        logger.info(f"Setting up S3 resource with access key ID {self.boto3_options['aws_access_key_id']}.")
+            logger.info(f"Setting up S3 resource with access key ID {self.boto3_options['aws_access_key_id']}.")
 
         return boto3.resource("s3", **self.boto3_options)
 
