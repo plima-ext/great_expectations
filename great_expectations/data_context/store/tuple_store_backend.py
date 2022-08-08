@@ -722,7 +722,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         import boto3
 
         if self.role_arn:
-            self._assume_role(self)
+            self._assume_role()
 
         return boto3.client("s3", **self.boto3_options)
 
@@ -751,7 +751,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         import boto3
 
         if self.role_arn:
-            self._assume_role(self)
+            self._assume_role()
 
         return boto3.resource("s3", **self.boto3_options)
 
