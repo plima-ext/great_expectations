@@ -746,21 +746,19 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
         # From the response that contains the assumed role, get the temporary
         # credentials that can be used to make subsequent API calls
-        credentials = assumed_role_object["Credentials"]
-
-        self.boto3_options.update(
-            aws_access_key_id=credentials["AccessKeyId"],
-            aws_secret_access_key=credentials["SecretAccessKey"],
-            aws_session_token=credentials["SessionToken"],
-        )
-        logger.info(f"Updating credentials for access key ID {credentials['AccessKeyId']}.")
+        return assumed_role_object["Credentials"]
 
     def _create_resource(self):
         import boto3
 
         logger.info(f"Creating resource with role_arn {self.role_arn}.")
         if self.role_arn:
-            self._assume_role()
+            credentials = self._assume_role()
+            self.boto3_options.update(
+                aws_access_key_id=credentials["AccessKeyId"],
+                aws_secret_access_key=credentials["SecretAccessKey"],
+                aws_session_token=credentials["SessionToken"],
+            )
             logger.info(f"Setting up S3 resource with access key ID {self.boto3_options['aws_access_key_id']}.")
 
         return boto3.resource("s3", **self.boto3_options)
