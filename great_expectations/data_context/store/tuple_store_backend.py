@@ -726,7 +726,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         if self.role_arn:
             self._assume_role()
             aws_access_key_id = self.boto3_options.get("aws_access_key_id", None)
-            logger.info(f"Setting up S3 client with access key ID {aws_access_key_id}.")
+            logger.debug(f"Setting up S3 client with access key ID {aws_access_key_id}.")
 
         return boto3.client("s3", **self.boto3_options)
 
@@ -740,7 +740,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         # STS service
         sts_client = boto3.client("sts", **self.boto3_options)
 
-        logger.info(f"Assuming role {self.role_arn}...")
+        logger.debug(f"Assuming role {self.role_arn}...")
 
         # Call the assume_role method of the STSConnection object and pass the role
         # ARN and a role session name.
@@ -763,7 +763,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         if self.role_arn:
             self._assume_role()
             aws_access_key_id = self.boto3_options.get("aws_access_key_id", None)
-            logger.info(f"Setting up S3 resource with access key ID {aws_access_key_id}.")
+            logger.debug(f"Setting up S3 resource with access key ID {aws_access_key_id}.")
         
         return boto3.resource("s3", **self.boto3_options)
 
