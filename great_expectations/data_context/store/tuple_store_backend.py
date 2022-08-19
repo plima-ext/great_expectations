@@ -724,13 +724,13 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
         if self.role_arn:
             self._assume_role()
+            aws_access_key_id = self.boto3_options.get("aws_access_key_id", None)
+            logger.info(f"Setting up S3 client with access key ID {aws_access_key_id}.")
 
         return boto3.client("s3", **self.boto3_options)
 
     def _assume_role(self):
         import boto3
-
-        logger.info(f"Assuming role {self.role_arn}...")
 
         # create an STS client object that represents a live connection to the
         # STS service
@@ -746,6 +746,10 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
         # From the response that contains the assumed role, get the temporary
         # credentials that can be used to make subsequent API calls
+        self.boto3_options["aws_access_key_id"] = assumed_role_object["Credentials"]["AccessKeyId"]
+        self.boto3_options["aws_secret_access_key"] = assumed_role_object["Credentials"]["SecretAccessKey"]
+        self.boto3_options["aws_session_token"] = assumed_role_object["Credentials"]["SessionToken"]
+
         return assumed_role_object["Credentials"]
 
     def _create_resource(self):
@@ -753,12 +757,10 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
         logger.info(f"Creating resource with role_arn {self.role_arn}.")
         if self.role_arn:
-            credentials = self._assume_role()
-            self.boto3_options["aws_access_key_id"] = credentials["AccessKeyId"]
-            self.boto3_options["aws_secret_access_key"] = credentials["SecretAccessKey"]
-            self.boto3_options["aws_session_token"] = credentials["SessionToken"]
-            logger.info(f"Setting up S3 resource with access key ID {credentials['AccessKeyId']}.")
-
+            self._assume_role()
+            aws_access_key_id = self.boto3_options.get("aws_access_key_id", None)
+            logger.info(f"Setting up S3 resource with access key ID {aws_access_key_id}.")
+        
         return boto3.resource("s3", **self.boto3_options)
 
     @property
