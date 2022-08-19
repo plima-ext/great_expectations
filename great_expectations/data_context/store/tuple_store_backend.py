@@ -746,9 +746,9 @@ class TupleS3StoreBackend(TupleStoreBackend):
 
         # From the response that contains the assumed role, get the temporary
         # credentials that can be used to make subsequent API calls
-        self.boto3_options["aws_access_key_id"] = assumed_role_object["Credentials"]["AccessKeyId"]
-        self.boto3_options["aws_secret_access_key"] = assumed_role_object["Credentials"]["SecretAccessKey"]
-        self.boto3_options["aws_session_token"] = assumed_role_object["Credentials"]["SessionToken"]
+        self._boto3_options["aws_access_key_id"] = assumed_role_object["Credentials"]["AccessKeyId"]
+        self._boto3_options["aws_secret_access_key"] = assumed_role_object["Credentials"]["SecretAccessKey"]
+        self._boto3_options["aws_session_token"] = assumed_role_object["Credentials"]["SessionToken"]
 
         return assumed_role_object["Credentials"]
 
