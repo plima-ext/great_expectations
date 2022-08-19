@@ -479,6 +479,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
             prefix = prefix.strip("/")
         self.prefix = prefix
         self.role_arn = role_arn
+        self.role_assumed = False
         if boto3_options is None:
             boto3_options = {}
         self._boto3_options = boto3_options
@@ -732,6 +733,9 @@ class TupleS3StoreBackend(TupleStoreBackend):
     def _assume_role(self):
         import boto3
 
+        if self.role_assumed:
+            return
+
         # create an STS client object that represents a live connection to the
         # STS service
         sts_client = boto3.client("sts", **self.boto3_options)
@@ -750,7 +754,7 @@ class TupleS3StoreBackend(TupleStoreBackend):
         self._boto3_options["aws_secret_access_key"] = assumed_role_object["Credentials"]["SecretAccessKey"]
         self._boto3_options["aws_session_token"] = assumed_role_object["Credentials"]["SessionToken"]
 
-        return assumed_role_object["Credentials"]
+        self.role_assumed = True
 
     def _create_resource(self):
         import boto3
