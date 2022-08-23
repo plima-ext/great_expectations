@@ -515,6 +515,9 @@ class TupleS3StoreBackend(TupleStoreBackend):
         }
         filter_properties_dict(properties=self._config, clean_falsy=True, inplace=True)
 
+        if self.role_arn:
+            self._assume_role()
+
     def _build_s3_object_key(self, key):
         if self.platform_specific_separator:
             if self.prefix:
@@ -723,18 +726,10 @@ class TupleS3StoreBackend(TupleStoreBackend):
     def _create_client(self):
         import boto3
 
-        if self.role_arn:
-            self._assume_role()
-            aws_access_key_id = self.boto3_options.get("aws_access_key_id", None)
-            logger.debug(f"Setting up S3 client with access key ID {aws_access_key_id}.")
-
         return boto3.client("s3", **self.boto3_options)
 
     def _assume_role(self):
         import boto3
-
-        if self.role_assumed:
-            return
 
         # create an STS client object that represents a live connection to the
         # STS service
@@ -754,17 +749,11 @@ class TupleS3StoreBackend(TupleStoreBackend):
         self._boto3_options["aws_secret_access_key"] = assumed_role_object["Credentials"]["SecretAccessKey"]
         self._boto3_options["aws_session_token"] = assumed_role_object["Credentials"]["SessionToken"]
 
-        self.role_assumed = True
+        logger.debug(f"Role {self.role_arn} assumed, access keys configured.")
 
     def _create_resource(self):
         import boto3
 
-        logger.info(f"Creating resource with role_arn {self.role_arn}.")
-        if self.role_arn:
-            self._assume_role()
-            aws_access_key_id = self.boto3_options.get("aws_access_key_id", None)
-            logger.debug(f"Setting up S3 resource with access key ID {aws_access_key_id}.")
-        
         return boto3.resource("s3", **self.boto3_options)
 
     @property
