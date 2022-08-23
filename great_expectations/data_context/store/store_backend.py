@@ -100,11 +100,12 @@ class StoreBackend(metaclass=ABCMeta):
                     value=f"{self.STORE_BACKEND_ID_PREFIX}{store_id}\n",
                 )
                 return store_id
-        except Exception:
+        except Exception as e:
             if not suppress_warning:
                 logger.warning(
                     f"Invalid store configuration: Please check the configuration of your {self.__class__.__name__} named {self.store_name}"
                 )
+                logger.exception(e)
             return self.STORE_BACKEND_INVALID_CONFIGURATION_ID
 
     # NOTE: AJB20201130 This store_backend_id and store_backend_id_warnings_suppressed was implemented to remove multiple warnings in DataContext.__init__ but this can be done more cleanly by more carefully going through initialization order in DataContext
